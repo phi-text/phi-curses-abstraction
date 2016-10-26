@@ -1,0 +1,5 @@
+name: curses_abst
+version: 1.0.0
+description: An abstraction layer over curses.
+author: phantamanta44
+homepage: https://github.com/phi-text
