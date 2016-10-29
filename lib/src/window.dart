@@ -65,6 +65,8 @@ abstract class Window {
   Stream<ResizeEvent> get resizeEvents => _resizeController.stream;
 
   void drawBuffer();
+
+  void drawRegion(int x, int y, int width, int height);
 }
 
 abstract class Cell {
