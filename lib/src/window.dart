@@ -9,15 +9,21 @@ void bindCurses(CursesBinding impl) {
 abstract class Window {
   Matrix<Cell> _cells;
   Cursor _cursor;
+  Function _cellFactory;
+  StreamController<ResizeEvent> _resizeEvent;
 
   Window(int x, int y, Function cellFactory, Cursor cursor) {
-    _cells = new Matrix.supplied(x, y, cellFactory);
-    _cursor = cursor;
+    this._cells = new Matrix.supplied(x, y, cellFactory);
+    this._cursor = cursor;
+    this._cellFactory = cellFactory;
+    this._resizeEvent = new StreamController.broadcast();
   }
 
-  factory Window.init(int width, int height) {
-    return _binding.initDisplay(width, height);
+  factory Window.init() {
+    return _binding.initDisplay();
   }
+
+  Cursor get cursor => _cursor;
 
   int get width => _cells.width;
 
@@ -44,6 +50,18 @@ abstract class Window {
         yield getCell(x + xOff, y + yOff);
     }
   }
+
+  void resize(int newWidth, int newHeight) {
+    _cells.resize(newWidth, newHeight);
+    for (int x = 0; x < width; x++) {
+      for (int y = 0; y < height; y++) {
+        if (!_cells.exists(x, y))
+          _cells.set(x, y, _cellFactory());
+      }
+    }
+  }
+
+  Stream<ResizeEvent> get resizeEvents => _resizeEvent.stream;
 
   void drawBuffer();
 }
@@ -125,4 +143,10 @@ enum TermColour {
 
 enum CursorShape {
   BLOCK_FULL, BLOCK_LARGE, BLOCK_HALF, BLOCK_SMALL, UNDERSCORE, BEAM
+}
+
+class ResizeEvent {
+  final int prevWidth, prevHeight, newWidth, newHeight;
+
+  ResizeEvent(this.prevWidth, this.prevHeight, this.newWidth, this.newHeight);
 }

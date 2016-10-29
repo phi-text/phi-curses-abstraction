@@ -30,6 +30,10 @@ class Matrix<T> {
     _backing[x + y * _width] = value;
   }
 
+  bool exists(int x, int y) {
+    return get(x, y) != null;
+  }
+
   void resize(int x, int y) {
     List<T> newList = new List(x * y);
     for (int i = 0; i < _backing.length; i++) {
@@ -40,4 +44,5 @@ class Matrix<T> {
     _backing = newList;
     _width = x;
   }
+
 }

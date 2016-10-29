@@ -1,7 +1,7 @@
 part of curses_abst;
 
 abstract class CursesBinding {
-  Window initDisplay(int width, int height);
+  Window initDisplay();
 
   TermColour get defaultBgColour;
 
