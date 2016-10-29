@@ -2,9 +2,9 @@ class Matrix<T> {
   List<T> _backing;
   int _width;
 
-  get width => _width;
+  int get width => _width;
 
-  get height => _backing.length ~/ _width;
+  int get height => _backing.length ~/ _width;
 
   Matrix(int x, int y) {
     this._backing = new List(x * y);

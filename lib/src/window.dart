@@ -1,19 +1,27 @@
 part of curses_abst;
 
+CursesBinding _binding;
+
+void bindCurses(CursesBinding impl) {
+  _binding = impl;
+}
+
 abstract class Window {
   Matrix<Cell> _cells;
+  Cursor _cursor;
 
-  Window(int width, int height) {
-    // TODO Implement
-  }
-
-  Window._init(int x, int y, Function cellFactory) {
+  Window(int x, int y, Function cellFactory, Cursor cursor) {
     _cells = new Matrix.supplied(x, y, cellFactory);
+    _cursor = cursor;
   }
 
-  get width => _cells.width;
+  factory Window.init(int width, int height) {
+    return _binding.initDisplay(width, height);
+  }
 
-  get height => _cells.height;
+  int get width => _cells.width;
+
+  int get height => _cells.height;
 
   Cell getCell(int x, int y) => _cells.get(x, y);
 
@@ -41,17 +49,80 @@ abstract class Window {
 }
 
 abstract class Cell {
-  String _text;
+  String _text = null;
+  TermColour _bg = _binding.defaultBgColour, _fg = _binding.defaultFgColour;
+  bool _bold = false, _italic = false, _strikethrough = false, _underline = false;
 
-  set text(String text) => _text = text;
+  set text(String text) => _text = text[0];
 
-  get text => _text;
+  String get text => _text;
 
-  void clearText() {
-    text = "";
+  set bg_col(TermColour colour) => _bg = colour;
+
+  TermColour get bg_col => _bg;
+
+  set fg_col(TermColour colour) => _fg = colour;
+
+  TermColour get fg_col => _fg;
+
+  set bold(bool bold) => _bold = bold;
+
+  bool get bold => _bold;
+
+  set italic(bool italic) => _italic = italic;
+
+  bool get italic => _italic;
+
+  set strikethrough(bool strikethrough) => _strikethrough = strikethrough;
+
+  bool get strikethrough => _strikethrough;
+
+  set underline(bool underline) => _underline = underline;
+
+  bool get underline => _underline;
+
+  void clearColour() {
+    _bg = _binding.defaultBgColour;
+    _fg = _binding.defaultFgColour;
   }
 
   void clear() {
-    // TODO Implement
+    text = null;
+    clearColour();
   }
+}
+
+abstract class Cursor {
+  int _x, _y;
+  CursorShape _shape;
+
+  int get x => _x;
+
+  set x(int value) => _x = value;
+
+  int get y => _y;
+
+  set y(int value) => _y = value;
+
+  CursorShape get shape => _shape;
+
+  set shape(CursorShape shape) => _shape = shape;
+
+  void clearShape() {
+    _shape = _binding.defaultCursorShape;
+  }
+
+  void setPosition(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
+enum TermColour {
+  BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
+}
+
+
+enum CursorShape {
+  BLOCK_FULL, BLOCK_LARGE, BLOCK_HALF, BLOCK_SMALL, UNDERSCORE, BEAM
 }
