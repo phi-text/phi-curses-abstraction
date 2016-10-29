@@ -10,13 +10,13 @@ abstract class Window {
   Matrix<Cell> _cells;
   Cursor _cursor;
   Function _cellFactory;
-  StreamController<ResizeEvent> _resizeEvent;
+  StreamController<ResizeEvent> _resizeController;
 
   Window(int x, int y, Function cellFactory, Cursor cursor) {
     this._cells = new Matrix.supplied(x, y, cellFactory);
     this._cursor = cursor;
     this._cellFactory = cellFactory;
-    this._resizeEvent = new StreamController.broadcast();
+    this._resizeController = new StreamController.broadcast();
   }
 
   factory Window.init() {
@@ -52,6 +52,7 @@ abstract class Window {
   }
 
   void resize(int newWidth, int newHeight) {
+    _resizeController.add(new ResizeEvent(width, height, newWidth, newHeight));
     _cells.resize(newWidth, newHeight);
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
@@ -61,7 +62,7 @@ abstract class Window {
     }
   }
 
-  Stream<ResizeEvent> get resizeEvents => _resizeEvent.stream;
+  Stream<ResizeEvent> get resizeEvents => _resizeController.stream;
 
   void drawBuffer();
 }
